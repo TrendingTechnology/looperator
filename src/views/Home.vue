@@ -221,15 +221,17 @@ export default {
       console.log("audio context started");
     });
 
-    let sampler = new Tone.Players(
-      {
-        "kick": "../public/drums/808/kick.wav",
-        "clap": "../public/drums/808/clap.wav",
-        "ch": "../public/drums/808/ch.wav",
-        "sn1": "../public/drums/808/sn1.wav"
-      },
-      () => console.log("drums ready")
-    ).toMaster();
+  this.index = 0;
+
+    // let sampler = new Tone.Players(
+    //   {
+    //     "kick": "../public/drums/808/kick.wav",
+    //     "clap": "../public/drums/808/clap.wav",
+    //     "ch": "../public/drums/808/ch.wav",
+    //     "sn1": "../public/drums/808/sn1.wav"
+    //   },
+    //   () => console.log("drums ready")
+    // ).toMaster();
 
 Tone.Transport.scheduleRepeat(repeat, '16n');
 let self = this;
@@ -239,17 +241,28 @@ function repeat(time) {
   //   if ($input.checked) synth.triggerAttackRelease(note, '8n', time);
   // }
 
-  // if (self.kickSeq[self.index] == true) {
-  //    sampler.get("kick").start()
-  //   console.log('playing kick')
-  // }
+  if (self.chSeq[self.index] == true) {
+var chSynth = new Tone.NoiseSynth().toMaster();
+chSynth.triggerAttackRelease("16n")
+  }
+
+    if (self.clapSeq[self.index] == true) {
+var clapSynth = new Tone.NoiseSynth().toMaster();
+clapSynth.set("noise.type", "white");
+clapSynth.set("envelope.decay", ".4");
+clapSynth.set("envelope.attack", "0.005");
+clapSynth.set("envelope.sustain", "0");
+clapSynth.triggerAttackRelease("16n")
+  }
+
+
 
   if (self.index < 15) {
   self.index++;
   } else {
     self.index = 0
   }
-  console.log(self.index)
+  // console.log(self.index)
 
 }
 
@@ -306,9 +319,11 @@ function repeat(time) {
     },
     playStop() {
       if (this.playing == false) {
+        this.index = 0;
         Tone.Transport.start();
         this.playing = true;
       } else {
+        this.index = 0;
         this.playing = false;
         Tone.Transport.stop();
       }
