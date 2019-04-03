@@ -1,5 +1,8 @@
 # looperator
 
+## What is it?
+Looperator is a super cool browser based drum machine / sequencer. It uses Tone.js for sequencing / synthesis / audio stuff and Vue for the front end.
+
 ## Project setup
 ```
 npm install
