@@ -2,7 +2,7 @@
   <div class="container">
     <div class="nav">
       <div class="title">
-        <h1>Looperator</h1>
+        <h1>Live.js</h1>
       </div>
       <div class="transport">
         <img
@@ -32,6 +32,9 @@
 
     <div class="step-grid">
       <div class="drum-title">Kick</div>
+      <div class="step-button" v-on:click="randomButtonClicked()">
+        <img class="random-button" src="../assets/icons/random.png">
+      </div>
       <div class="step kick" v-bind:class="{ kickActive: kickSeq[0] }" v-on:click="toggleKick(0)"></div>
       <div class="step kick" v-bind:class="{ kickActive: kickSeq[1] }" v-on:click="toggleKick(1)"></div>
       <div class="step kick" v-bind:class="{ kickActive: kickSeq[2] }" v-on:click="toggleKick(2)"></div>
@@ -52,7 +55,7 @@
         class="vol-knob"
         :min="0"
         :max="100"
-        :size="50"
+        :size="40"
         :stroke-width="12"
         v-model="kickVol"
         primary-color="#67D0F7"
@@ -61,6 +64,10 @@
 
     <div class="step-grid">
       <div class="drum-title">Clap</div>
+      <div class="step-button" v-on:click="randomButtonClicked()">
+        <img class="random-button" src="../assets/icons/random.png">
+      </div>
+
       <div class="step clap" v-bind:class="{ clapActive: clapSeq[0] }" v-on:click="toggleClap(0)"></div>
       <div class="step clap" v-bind:class="{ clapActive: clapSeq[1] }" v-on:click="toggleClap(1)"></div>
       <div class="step clap" v-bind:class="{ clapActive: clapSeq[2] }" v-on:click="toggleClap(2)"></div>
@@ -81,7 +88,7 @@
         class="vol-knob"
         :min="0"
         :max="100"
-        :size="50"
+        :size="40"
         :stroke-width="12"
         v-model="clapVol"
         primary-color="#67D0F7"
@@ -101,7 +108,7 @@
         class="vol-knob"
         :min="0"
         :max="100"
-        :size="50"
+        :size="40"
         :stroke-width="12"
         v-model="ohVol"
         primary-color="#67D0F7"
@@ -109,7 +116,9 @@
     </div>-->
     <div class="step-grid">
       <div class="drum-title">Closed Hat</div>
-
+      <div class="step-button" v-on:click="randomButtonClicked()">
+        <img class="random-button" src="../assets/icons/random.png">
+      </div>
       <div class="step ch" v-bind:class="{ chActive: chSeq[0] }" v-on:click="toggleCh(0)"></div>
       <div class="step ch" v-bind:class="{ chActive: chSeq[1] }" v-on:click="toggleCh(1)"></div>
       <div class="step ch" v-bind:class="{ chActive: chSeq[2] }" v-on:click="toggleCh(2)"></div>
@@ -131,7 +140,7 @@
         class="vol-knob"
         :min="0"
         :max="100"
-        :size="50"
+        :size="40"
         :stroke-width="12"
         v-model="chVol"
         primary-color="#67D0F7"
@@ -139,6 +148,10 @@
     </div>
     <div class="step-grid">
       <div class="drum-title">Snare 1</div>
+      <div class="step-button" v-on:click="randomButtonClicked()">
+        <img class="random-button" src="../assets/icons/random.png">
+      </div>
+
       <div class="step sn1" v-bind:class="{ sn1Active: sn1Seq[0] }" v-on:click="toggleSn1(0)"></div>
       <div class="step sn1" v-bind:class="{ sn1Active: sn1Seq[1] }" v-on:click="toggleSn1(1)"></div>
       <div class="step sn1" v-bind:class="{ sn1Active: sn1Seq[2] }" v-on:click="toggleSn1(2)"></div>
@@ -159,7 +172,7 @@
         class="vol-knob"
         :min="0"
         :max="100"
-        :size="50"
+        :size="40"
         :stroke-width="12"
         v-model="sn1Vol"
         primary-color="#67D0F7"
@@ -201,7 +214,7 @@
         class="vol-knob"
         :min="0"
         :max="100"
-        :size="50"
+        :size="40"
         :stroke-width="12"
         v-model="sn2Vol"
         primary-color="#67D0F7"
@@ -217,11 +230,20 @@ import StartAudioContext from "startaudiocontext";
 export default {
   name: "home",
   created() {
+    //need to start audio context this way due to new browser restrictions
     StartAudioContext(Tone.context, "#button").then(function() {
       console.log("audio context started");
     });
 
-  this.index = 0;
+    // Tie play/stop button to space bar
+    window.addEventListener("keydown", e => {
+      if (e.code == "Space") {
+        this.playStop();
+      }
+    });
+
+    //sequencer index init
+    this.index = 0;
 
     // let sampler = new Tone.Players(
     //   {
@@ -233,42 +255,45 @@ export default {
     //   () => console.log("drums ready")
     // ).toMaster();
 
-Tone.Transport.scheduleRepeat(repeat, '16n');
-let self = this;
-function repeat(time) {
-  // let step = self.index % 16;
-  // for (let i = 0; i < 4; i++) {
-  //   if ($input.checked) synth.triggerAttackRelease(note, '8n', time);
-  // }
+    Tone.Transport.scheduleRepeat(repeat, "16n");
+    let self = this;
+    function repeat(time) {
+      // let step = self.index % 16;
+      // for (let i = 0; i < 4; i++) {
+      //   if ($input.checked) synth.triggerAttackRelease(note, '8n', time);
+      // }
 
-  if (self.chSeq[self.index] == true) {
-var chSynth = new Tone.NoiseSynth().toMaster();
-chSynth.triggerAttackRelease("16n")
-  }
+      if (self.chSeq[self.index] == true) {
+        var chSynth = new Tone.NoiseSynth().toMaster();
+        chSynth.triggerAttackRelease("16n");
+      }
 
-    if (self.clapSeq[self.index] == true) {
-var clapSynth = new Tone.NoiseSynth().toMaster();
-clapSynth.set("noise.type", "white");
-clapSynth.set("envelope.decay", ".4");
-clapSynth.set("envelope.attack", "0.005");
-clapSynth.set("envelope.sustain", "0");
-clapSynth.triggerAttackRelease("16n")
-  }
+      if (self.clapSeq[self.index] == true) {
+        var clapSynth = new Tone.NoiseSynth().toMaster();
+        clapSynth.set("noise.type", "white");
+        clapSynth.set("envelope.decay", ".4");
+        clapSynth.set("envelope.attack", "0.005");
+        clapSynth.set("envelope.sustain", "0");
+        clapSynth.triggerAttackRelease("16n");
+      }
 
+      if (self.kickSeq[self.index] == true) {
+        var kickSynth = new Tone.MembraneSynth().toMaster();
+        kickSynth.triggerAttackRelease("C2", "16n");
+      }
 
-
-  if (self.index < 15) {
-  self.index++;
-  } else {
-    self.index = 0
-  }
-  // console.log(self.index)
-
-}
-
-
+      // move index up one every note
+      if (self.index < 15) {
+        self.index++;
+      } else {
+        self.index = 0;
+      }
+    }
   },
   methods: {
+    randomButtonClicked() {
+      console.log(Math.random() < 0.5);
+    },
     toggleKick(number) {
       console.log(this.kickSeq[number]);
       if (this.kickSeq[number] == false) {
@@ -320,7 +345,7 @@ clapSynth.triggerAttackRelease("16n")
     playStop() {
       if (this.playing == false) {
         this.index = 0;
-        Tone.Transport.start();
+        Tone.Transport.start("+0.1");
         this.playing = true;
       } else {
         this.index = 0;
@@ -333,7 +358,7 @@ clapSynth.triggerAttackRelease("16n")
   data() {
     return {
       bpm: 120,
-      index:0,
+      index: 0,
       playing: false,
       kickSeq: {
         0: false,
@@ -435,12 +460,12 @@ clapSynth.triggerAttackRelease("16n")
         seven: false,
         eight: false
       },
-      kickVol: 50,
-      clapVol: 50,
-      ohVol: 50,
-      chVol: 50,
-      sn1Vol: 50,
-      sn2Vol: 50
+      kickVol: 40,
+      clapVol: 40,
+      ohVol: 40,
+      chVol: 40,
+      sn1Vol: 40,
+      sn2Vol: 40
     };
   },
   watch: {
@@ -453,6 +478,11 @@ clapSynth.triggerAttackRelease("16n")
 </script>
 
 <style>
+.random-button {
+  height: 20px;
+  margin-right: 9px;
+}
+
 .transport {
   display: inline-block;
 }
@@ -504,6 +534,12 @@ nav {
   height: 20px;
   width: 20px;
   background-color: #636363;
+}
+
+.step-button {
+  margin: 5px;
+  height: 20px;
+  width: 20px;
 }
 
 .step-grid {
